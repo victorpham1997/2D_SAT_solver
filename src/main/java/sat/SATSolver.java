@@ -106,27 +106,18 @@ public class SATSolver {
                                              Literal l) {
         // TODO: implement this.
         //throw new RuntimeException("not yet implemented.");
-        ImList<Clause> out_clauses= new ImList<Clause>();
+        ImList<Clause> new_cl;
 
         for(Clause cl : clauses){
-            // if(cl.contains(l)){
-            //     Clause new_cl = cl.reduce(l);
-            //     if(new_cl.isEmpty){
-            //         ;
-            //     }else{
-            //         out_clauses.add();
-            //     }
-            // }else{
-            //     out_clauses.add(cl);
-            // }
-
-            if(cl.reduce(l) != null){
-                out_clauses.add(cl);
+            Clause reduced = cl.reduce(l);
+            if(!(reduced == null)){
+                clauses = clauses.remove(cl);
+                clauses = clauses.add(reduced);
             }else{
-                ;
+                clauses = clauses.remove(cl);
             }
         }
-        return out_clauses;
+        return clauses;
     }
 
 }
