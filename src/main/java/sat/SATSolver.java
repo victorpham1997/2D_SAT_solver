@@ -21,8 +21,8 @@ public class SATSolver {
      *         null if no such environment exists.
      */
     public static Environment solve(Formula formula) {
-        System.out.println("solve started");
-        System.out.println(formula.getClauses());
+//        System.out.println("solve started");
+//        System.out.println(formula.getClauses());
         Environment result = solve(formula.getClauses(),new Environment());
         if(!(result== null)) return result;
         else return null;
@@ -56,7 +56,7 @@ public class SATSolver {
                 smallest_cl = cl;
             }
         }
-        System.out.println(smallest_cl);
+        //System.out.println(smallest_cl);
 
         Literal l = smallest_cl.chooseLiteral(); //choose the first literal of the smallest clause
         if(smallest_cl.isUnit()){

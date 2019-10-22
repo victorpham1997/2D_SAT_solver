@@ -1,74 +1,117 @@
 package sat;
 
-/*
-import static org.junit.Assert.*;
+import immutable.ImList;
+import sat.env.Environment;
+import sat.formula.Clause;
+import sat.formula.Formula;
+import sat.formula.Literal;
+import sat.formula.PosLiteral;
 
-import org.junit.Test;
-*/
+/**
+ * A simple DPLL SAT solver. See http://en.wikipedia.org/wiki/DPLL_algorithm
+ */
+public class SATSolver {
+    /**
+     * Solve the problem using a simple version of DPLL with backtracking and
+     * unit propagation. The returned environment binds literals of class
+     * bool.Variable rather than the special literals used in clausification of
+     * class clausal.Literal, so that clients can more readily use it.
+     *
+     * @return an environment for which the problem evaluates to Bool.TRUE, or
+     *         null if no such environment exists.
+     */
+    public static Environment solve(Formula formula) {
+//        System.out.println("solve started");
+//        System.out.println(formula.getClauses());
+        Environment result = solve(formula.getClauses(),new Environment());
+        if(!(result== null)) return result;
+        else return null;
 
-import sat.env.*;
-import sat.formula.*;
-
-
-public class SATSolverTest {
-    Literal a = PosLiteral.make("a");
-    Literal b = PosLiteral.make("b");
-    Literal c = PosLiteral.make("c");
-    Literal na = a.getNegation();
-    Literal nb = b.getNegation();
-    Literal nc = c.getNegation();
-
-
-
-    
-    // TODO: add the main method that reads the .cnf file and calls SATSolver.solve to determine the satisfiability
-
-    
-    public Environment testSATSolver1(){
-        // (a v b)
-        Environment e = SATSolver.solve(makeFm(makeCl(a,b)) );
-        return e;
-/*
-        assertTrue( "one of the literals should be set to true",
-                Bool.TRUE == e.get(a.getVariable())  
-                || Bool.TRUE == e.get(b.getVariable())  );
-        
-*/      
     }
-    
-    
-    public Environment testSATSolver2(){
-        // (~a)
-        Environment e = SATSolver.solve(makeFm(makeCl(na)));
-        return e;
-        /*
-        assertEquals( Bool.FALSE, e.get(na.getVariable()));
-*/      
-    }
-    
-    private static Formula makeFm(Clause... e) {
-        Formula f = new Formula();
-        for (Clause c : e) {
-            f = f.addClause(c);
+
+    /**
+     * Takes a partial assignment of variables to values, and recursively
+     * searches for a complete satisfying assignment.
+     *
+     * @param clauses
+     *            formula in conjunctive normal form
+     * @param env
+     *            assignment of some or all variables in clauses to true or
+     *            false values.
+     * @return an environment for which all the clauses evaluate to Bool.TRUE,
+     *         or null if no such environment exists.
+     */
+    private static Environment solve(ImList<Clause> clauses, Environment env) {
+        if(clauses.isEmpty()){
+            return env;
         }
-        return f;
-    }
-    
-    private static Clause makeCl(Literal... e) {
-        Clause c = new Clause();
-        for (Literal l : e) {
-            c = c.add(l);
+        int smallest = clauses.first().size();
+        Clause smallest_cl = clauses.first();
+        for(Clause cl : clauses){
+            if(cl.isEmpty()){
+                return null;
+            }
+            if(cl.size() < smallest){
+                smallest = cl.size();
+                smallest_cl = cl;
+            }
         }
-        return c;
+        //System.out.println(smallest_cl);
+
+        Literal l = smallest_cl.chooseLiteral(); //choose the first literal of the smallest clause
+        if(smallest_cl.isUnit()){
+            ImList<Clause> new_clauses = substitute(clauses , l );
+            //set environment
+            Environment new_env = updateEnv(l, env);
+            return solve(new_clauses, new_env);
+
+        }else{
+            ImList<Clause> new_clauses = substitute(clauses , l);
+            //set environment
+            Environment new_env = updateEnv(l, env);
+            Environment temp_env = solve(new_clauses, new_env);
+
+            if(temp_env == null){
+                ImList<Clause> new_false_clauses = substitute(clauses , l.getNegation());
+                //set environment
+                Environment new_false_env = updateEnv(l.getNegation(), env);
+                return solve(new_false_clauses, new_false_env);
+            }
+            return temp_env;
+        }
+
+    }
+    private static Environment updateEnv( Literal l, Environment env){
+        if(l instanceof PosLiteral ){
+            return env.putTrue(l.getVariable());
+        }else{
+            return env.putFalse(l.getVariable());
+        }
     }
 
-    public static void main(String [] args){
-        SATSolverTest TEST =  new SATSolverTest();
-        System.out.println(TEST.testSATSolver1());
-        System.out.println(TEST.testSATSolver2());
-//        System.out.println("hello world");
+
+    /**
+     * given a clause list and literal, produce a new list resulting from
+     * setting that literal to true
+     *
+     * @param clauses
+     *            , a list of clauses
+     * @param l
+     *            , a literal to set to true
+     * @return a new list of clauses resulting from setting l to true
+     */
+    private static ImList<Clause> substitute(ImList<Clause> clauses,
+                                             Literal l) {
+        for(Clause cl : clauses){
+            Clause reduced = cl.reduce(l);
+            if(!(reduced == null)){
+                clauses = clauses.remove(cl);
+                clauses = clauses.add(reduced);
+            }else{
+                clauses = clauses.remove(cl);
+            }
+        }
+        return clauses;
     }
-    
-    
+
 }
-
