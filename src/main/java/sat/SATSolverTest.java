@@ -22,26 +22,29 @@ public class SATSolverTest {
 
 	
 	// TODO: add the main method that reads the .cnf file and calls SATSolver.solve to determine the satisfiability
-    
+    public static void main(String[] args){
+        testSATSolver1();
+        testSATSolver2();
+    }
 	
     public void testSATSolver1(){
     	// (a v b)
     	Environment e = SATSolver.solve(makeFm(makeCl(a,b))	);
-/*
+
     	assertTrue( "one of the literals should be set to true",
     			Bool.TRUE == e.get(a.getVariable())  
     			|| Bool.TRUE == e.get(b.getVariable())	);
     	
-*/    	
+    	
     }
     
     
     public void testSATSolver2(){
     	// (~a)
     	Environment e = SATSolver.solve(makeFm(makeCl(na)));
-/*
+
     	assertEquals( Bool.FALSE, e.get(na.getVariable()));
-*/    	
+    	
     }
     
     private static Formula makeFm(Clause... e) {

@@ -22,10 +22,16 @@ public class SATSolver {
      */
     public static Environment solve(Formula formula) {
         // TODO: implement this.
+<<<<<<< Updated upstream
         Environment result = solve(formula.getClauses(),new Environment());
         if(!(result== null)) return result;
         else return null;
 
+=======
+        //throw new RuntimeException("not yet implemented.");
+        
+    
+>>>>>>> Stashed changes
     }
 
     /**
