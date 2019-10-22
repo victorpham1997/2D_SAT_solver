@@ -1,0 +1,6 @@
+c satisfiable
+c
+p cnf 5 3 0
+1 2 3 0
+2 -3 -5 0
+-2 4 0
