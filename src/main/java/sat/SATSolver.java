@@ -5,9 +5,7 @@ import sat.env.Environment;
 import sat.formula.Clause;
 import sat.formula.Formula;
 import sat.formula.Literal;
-import sat.formula.NegLiteral;
 import sat.formula.PosLiteral;
-
 
 /**
  * A simple DPLL SAT solver. See http://en.wikipedia.org/wiki/DPLL_algorithm
@@ -18,22 +16,22 @@ public class SATSolver {
      * unit propagation. The returned environment binds literals of class
      * bool.Variable rather than the special literals used in clausification of
      * class clausal.Literal, so that clients can more readily use it.
-     *
+     * 
      * @return an environment for which the problem evaluates to Bool.TRUE, or
      *         null if no such environment exists.
      */
     public static Environment solve(Formula formula) {
         // TODO: implement this.
+        Environment result = solve(formula.getClauses(),new Environment());
+        if(!(result== null)) return result;
+        else return null;
 
-
-
-        throw new RuntimeException("not yet implemented.");
     }
 
     /**
      * Takes a partial assignment of variables to values, and recursively
      * searches for a complete satisfying assignment.
-     *
+     * 
      * @param clauses
      *            formula in conjunctive normal form
      * @param env
@@ -44,24 +42,21 @@ public class SATSolver {
      */
     private static Environment solve(ImList<Clause> clauses, Environment env) {
         // TODO: implement this.
-        //throw new RuntimeException("not yet implemented.");
         if(clauses.isEmpty()){
             return env;
         }
+        int smallest = clauses.first().size();
+        Clause smallest_cl = new Clause();
         for(Clause cl : clauses){
             if(cl.isEmpty()){
                 return null;
             }
-        }
-        int smallest = 100000;
-        Clause smallest_cl = new Clause();
-        for(Clause cl : clauses){
             if(cl.size() < smallest){
                 smallest = cl.size();
                 smallest_cl = cl;
             }
         }
-        Literal l = smallest_cl.chooseLiteral();
+        Literal l = smallest_cl.chooseLiteral(); //choose the first literal of the smallest clause
         if(smallest_cl.isUnit()){
             ImList<Clause> new_clauses = substitute(clauses , l );
             //set enviroment
@@ -92,10 +87,11 @@ public class SATSolver {
         }
     }
 
+
     /**
      * given a clause list and literal, produce a new list resulting from
      * setting that literal to true
-     *
+     * 
      * @param clauses
      *            , a list of clauses
      * @param l
@@ -103,11 +99,8 @@ public class SATSolver {
      * @return a new list of clauses resulting from setting l to true
      */
     private static ImList<Clause> substitute(ImList<Clause> clauses,
-                                             Literal l) {
+            Literal l) {
         // TODO: implement this.
-        //throw new RuntimeException("not yet implemented.");
-        ImList<Clause> new_cl;
-
         for(Clause cl : clauses){
             Clause reduced = cl.reduce(l);
             if(!(reduced == null)){
