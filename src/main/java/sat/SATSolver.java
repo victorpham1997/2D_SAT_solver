@@ -43,35 +43,51 @@ public class SATSolver {
     private static Environment solve(ImList<Clause> clauses, Environment env) {
         // TODO: implement this.
         //throw new RuntimeException("not yet implemented.");
+        if(clauses.isEmpty()){
+            return env;
+        }
+        for(Clause cl : clauses){
+            if(cl.isEmpty()){
+                return null;
+            }
+        }
         int smallest = 100000;
         Clause smallest_cl;
         for(Clause cl : clauses){
             if(cl.size() < smallest){
-                cl.size = smallest;
+                smallest = cl.size;
                 smallest_cl = cl;
             }
         }
+        Literal l = smallest_cl.chooseLiteral();
         if(smallest_cl.isUnit()){
-            substitute(clauses , smallest_cl.chooseLiteral())           
-        }
+            ImList<Clause> new_clauses = substitute(clauses , l );        
+            //set enviroment
+            Environment new_env = updateEnv(l, env);
+            return solve(new_clauses, new_env);
 
-        if(clauses)
+        }else{
+            ImList<Clause> new_clauses = substitute(clauses , l);          
+            //set environemnt
+            Environment new_env = updateEnv(l, env);
+            return solve(new_clauses, new_env); 
 
-
-        for(Clause cl : clauses){
-            for(Literal li : cl){
-                if(env.get(li.getVariable) == true){
-                    substitute(clauses,li.getVariable);
-                    break;
-                }else{
-
-                }
+            if(new_e == null){
+                ImList<Clause> new_clauses_false = substitute(clauses , l.getNegation());
+                //set environment
+                Environment new_env = updateEnv(l.getNegation(), env);
+                return solve(new_clauses_false, new_env);
             }
         }
 
-        
-
-
+    }
+    private static Environemnt updateEnv( Literal l, Environemnt env){
+        if(l instanceof PosLiteral ){
+            Environemnt new_env = env.putTrue(l.getVariable());
+        }else if(l instanceof NegLiteral){
+            Environemnt new_env = env.putFalse(l.getVariable());
+        }
+        return new_env;
     }
 
     /**
@@ -88,7 +104,7 @@ public class SATSolver {
             Literal l) {
         // TODO: implement this.
         //throw new RuntimeException("not yet implemented.");
-        ImList<Clause> out_clauses;
+        ImList<Clause> out_clauses= new ImList<Clause>();
 
         for(Clause cl : clauses){
             // if(cl.contains(l)){
