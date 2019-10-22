@@ -1,14 +1,62 @@
 package sat;
 
-/*
-import static org.junit.Assert.*;
+import immutable.ImList;
+import sat.env.Environment;
+import sat.formula.Clause;
+import sat.formula.Formula;
+import sat.formula.Literal;
+import sat.formula.PosLiteral;
 
-import org.junit.Test;
-*/
+/**
+ * A simple DPLL SAT solver. See http://en.wikipedia.org/wiki/DPLL_algorithm
+ */
+public class SATSolver {
+    /**
+     * Solve the problem using a simple version of DPLL with backtracking and
+     * unit propagation. The returned environment binds literals of class
+     * bool.Variable rather than the special literals used in clausification of
+     * class clausal.Literal, so that clients can more readily use it.
+     *
+     * @return an environment for which the problem evaluates to Bool.TRUE, or
+     *         null if no such environment exists.
+     */
+    public static Environment solve(Formula formula) {
+//        System.out.println("solve started");
+//        System.out.println(formula.getClauses());
+        Environment result = solve(formula.getClauses(),new Environment());
+        if(!(result== null)) return result;
+        else return null;
 
-import sat.env.*;
-import sat.formula.*;
+    }
 
+    /**
+     * Takes a partial assignment of variables to values, and recursively
+     * searches for a complete satisfying assignment.
+     *
+     * @param clauses
+     *            formula in conjunctive normal form
+     * @param env
+     *            assignment of some or all variables in clauses to true or
+     *            false values.
+     * @return an environment for which all the clauses evaluate to Bool.TRUE,
+     *         or null if no such environment exists.
+     */
+    private static Environment solve(ImList<Clause> clauses, Environment env) {
+        if(clauses.isEmpty()){
+            return env;
+        }
+        int smallest = clauses.first().size();
+        Clause smallest_cl = clauses.first();
+        for(Clause cl : clauses){
+            if(cl.isEmpty()){
+                return null;
+            }
+            if(cl.size() < smallest){
+                smallest = cl.size();
+                smallest_cl = cl;
+            }
+        }
+        //System.out.println(smallest_cl);
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -27,7 +75,20 @@ public class SATSolverTest {
     Literal nb = b.getNegation();
     Literal nc = c.getNegation();
 
+        }else{
+            ImList<Clause> new_clauses = substitute(clauses , l);
+            //set environment
+            Environment new_env = updateEnv(l, env);
+            Environment temp_env = solve(new_clauses, new_env);
 
+            if(temp_env == null){
+                ImList<Clause> new_false_clauses = substitute(clauses , l.getNegation());
+                //set environment
+                Environment new_false_env = updateEnv(l.getNegation(), env);
+                return solve(new_false_clauses, new_false_env);
+            }
+            return temp_env;
+        }
 
     
     // TODO: add the main method that reads the .cnf file and calls SATSolver.solve to determine the satisfiability
@@ -169,7 +230,6 @@ public class SATSolverTest {
         for (Clause c : clauses_arr) {
             f = f.addClause(c);
         }
-        return f;
     }
 
 //    private static Clause makeCl(Literal... e) {
@@ -185,7 +245,7 @@ public class SATSolverTest {
         for (Literal l : literals_arr) {
             c = c.add(l);
         }
-        return c;
+        return clauses;
     }
 
 //    public static void main(String [] args){
@@ -195,4 +255,3 @@ public class SATSolverTest {
 ////        System.out.println("hello world");
 //    }
 }
-
