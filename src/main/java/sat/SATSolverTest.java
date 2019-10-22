@@ -31,7 +31,7 @@ public class SATSolverTest {
     // TODO: add the main method that reads the .cnf file and calls SATSolver.solve to determine the satisfiability
     public static void main(String[] args)
     {
-        String fileName = "/home/victorpham1997/Workplace/SUTD/2D/2D_SAT_solver/SAT/Project-2D-starting/sampleCNF/test2.cnf";
+        String fileName = "/home/victorpham1997/Workplace/SUTD/2D/2D_SAT_solver/SAT/Project-2D-starting/sampleCNF/largeSat.cnf";
         List<String> lines = readFile(fileName);
         Formula formula = linesToFormula(lines);
         System.out.println(formula);
@@ -42,13 +42,14 @@ public class SATSolverTest {
         long time = System.nanoTime();
         long timeTaken= time - started;
         System.out.println("Time:" + timeTaken/1000000.0 + "ms");
-        System.out.println(env.toString());
+
 //        System.out.println(formula);
         if (env == null) {
             System.out.println("not satisfiable");
         }
         else {
             System.out.println("satisfiable");
+            System.out.println(env.toString());
 //            try {
 //                String nameOfOutputFile = "BoolAssignment.txt";
 //                FileWriter fw = new FileWriter(yourFilePath + nameOfOutputFile);

@@ -52,7 +52,6 @@ public class SATSolver {
                 return null;
             }
             if(cl.size() < smallest){
-
                 smallest = cl.size();
                 smallest_cl = cl;
             }
@@ -60,25 +59,31 @@ public class SATSolver {
         //System.out.println(smallest_cl);
 
         Literal l = smallest_cl.chooseLiteral(); //choose the first literal of the smallest clause
-        System.out.println( smallest_cl );
+//        System.out.println( smallest_cl );
         if(smallest_cl.isUnit()){
-            System.out.println("uniclause detected");
-            ImList<Clause> new_clauses = substitute(clauses , l );
+//            System.out.println("uniclause detected");
+//            clauses = substitute(clauses , l );
             //set environment
-            Environment new_env = updateEnv(l, env);
-            return solve(new_clauses, new_env);
+//            env = updateEnv(l, env);
+//            System.out.print("uniclause l switched:");
+//            System.out.println(l);
+            return solve(substitute(clauses , l ), updateEnv(l, env));
 
         }else{
-            ImList<Clause> new_clauses = substitute(clauses , l);
+//            ImList<Clause> new_clauses = substitute(clauses , l);
             //set environment
-            Environment new_env = updateEnv(l, env);
-            Environment temp_env = solve(new_clauses, new_env);
+//            Environment new_env = updateEnv(l, env);
+            Environment temp_env = solve(substitute(clauses , l), updateEnv(l, env));
+//            System.out.print("case switched:");
+//            System.out.println(l);
 
             if(temp_env == null){
-                ImList<Clause> new_false_clauses = substitute(clauses , l.getNegation());
+//                ImList<Clause> new_false_clauses = substitute(clauses , l.getNegation());
                 //set environment
-                Environment new_false_env = updateEnv(l.getNegation(), env);
-                return solve(new_false_clauses, new_false_env);
+//                Environment new_false_env = updateEnv(l.getNegation(), env);
+//                System.out.print("case negate switched:");
+//                System.out.println(l);
+                return solve(substitute(clauses , l.getNegation()), updateEnv(l.getNegation(), env));
             }
             return temp_env;
         }
@@ -105,14 +110,25 @@ public class SATSolver {
      */
     private static ImList<Clause> substitute(ImList<Clause> clauses,
                                              Literal l) {
+//        for(Clause cl : clauses){
+////            Clause reduced = cl.reduce(l);
+//            if(cl.reduce(l) != null){
+//                clauses = clauses.remove(cl).add(cl.reduce(l));
+////                clauses = clauses.add(reduced);
+//            }else{
+//                clauses = clauses.remove(cl);
+//            }
+//        }
         for(Clause cl : clauses){
-            Clause reduced = cl.reduce(l);
-            if(!(reduced == null)){
-                clauses = clauses.remove(cl).add(reduced);
-//                clauses = clauses.add(reduced);
-            }else{
+//            Clause reduced = cl.reduce(l);
+            if(cl.contains(l)){
                 clauses = clauses.remove(cl);
+            }else if(cl.contains(l.getNegation())){
+                clauses = clauses.remove(cl).add(cl.reduce(l));
+            }else{
+                continue;
             }
+
         }
         return clauses;
     }
