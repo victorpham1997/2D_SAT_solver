@@ -52,6 +52,7 @@ public class SATSolver {
                 return null;
             }
             if(cl.size() < smallest){
+
                 smallest = cl.size();
                 smallest_cl = cl;
             }
@@ -59,7 +60,9 @@ public class SATSolver {
         //System.out.println(smallest_cl);
 
         Literal l = smallest_cl.chooseLiteral(); //choose the first literal of the smallest clause
+        System.out.println( smallest_cl );
         if(smallest_cl.isUnit()){
+            System.out.println("uniclause detected");
             ImList<Clause> new_clauses = substitute(clauses , l );
             //set environment
             Environment new_env = updateEnv(l, env);
@@ -105,8 +108,8 @@ public class SATSolver {
         for(Clause cl : clauses){
             Clause reduced = cl.reduce(l);
             if(!(reduced == null)){
-                clauses = clauses.remove(cl);
-                clauses = clauses.add(reduced);
+                clauses = clauses.remove(cl).add(reduced);
+//                clauses = clauses.add(reduced);
             }else{
                 clauses = clauses.remove(cl);
             }

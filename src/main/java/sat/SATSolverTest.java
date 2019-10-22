@@ -1,62 +1,14 @@
 package sat;
 
-import immutable.ImList;
-import sat.env.Environment;
-import sat.formula.Clause;
-import sat.formula.Formula;
-import sat.formula.Literal;
-import sat.formula.PosLiteral;
+/*
+import static org.junit.Assert.*;
 
-/**
- * A simple DPLL SAT solver. See http://en.wikipedia.org/wiki/DPLL_algorithm
- */
-public class SATSolver {
-    /**
-     * Solve the problem using a simple version of DPLL with backtracking and
-     * unit propagation. The returned environment binds literals of class
-     * bool.Variable rather than the special literals used in clausification of
-     * class clausal.Literal, so that clients can more readily use it.
-     *
-     * @return an environment for which the problem evaluates to Bool.TRUE, or
-     *         null if no such environment exists.
-     */
-    public static Environment solve(Formula formula) {
-//        System.out.println("solve started");
-//        System.out.println(formula.getClauses());
-        Environment result = solve(formula.getClauses(),new Environment());
-        if(!(result== null)) return result;
-        else return null;
+import org.junit.Test;
+*/
 
-    }
+import sat.env.*;
+import sat.formula.*;
 
-    /**
-     * Takes a partial assignment of variables to values, and recursively
-     * searches for a complete satisfying assignment.
-     *
-     * @param clauses
-     *            formula in conjunctive normal form
-     * @param env
-     *            assignment of some or all variables in clauses to true or
-     *            false values.
-     * @return an environment for which all the clauses evaluate to Bool.TRUE,
-     *         or null if no such environment exists.
-     */
-    private static Environment solve(ImList<Clause> clauses, Environment env) {
-        if(clauses.isEmpty()){
-            return env;
-        }
-        int smallest = clauses.first().size();
-        Clause smallest_cl = clauses.first();
-        for(Clause cl : clauses){
-            if(cl.isEmpty()){
-                return null;
-            }
-            if(cl.size() < smallest){
-                smallest = cl.size();
-                smallest_cl = cl;
-            }
-        }
-        //System.out.println(smallest_cl);
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -75,28 +27,14 @@ public class SATSolverTest {
     Literal nb = b.getNegation();
     Literal nc = c.getNegation();
 
-        }else{
-            ImList<Clause> new_clauses = substitute(clauses , l);
-            //set environment
-            Environment new_env = updateEnv(l, env);
-            Environment temp_env = solve(new_clauses, new_env);
 
-            if(temp_env == null){
-                ImList<Clause> new_false_clauses = substitute(clauses , l.getNegation());
-                //set environment
-                Environment new_false_env = updateEnv(l.getNegation(), env);
-                return solve(new_false_clauses, new_false_env);
-            }
-            return temp_env;
-        }
-
-    
     // TODO: add the main method that reads the .cnf file and calls SATSolver.solve to determine the satisfiability
     public static void main(String[] args)
     {
-        String fileName = "/home/victorpham1997/Workplace/SUTD/2D/2D_SAT_solver/SAT/Project-2D-starting/sampleCNF/test3.cnf";
+        String fileName = "/home/victorpham1997/Workplace/SUTD/2D/2D_SAT_solver/SAT/Project-2D-starting/sampleCNF/test2.cnf";
         List<String> lines = readFile(fileName);
         Formula formula = linesToFormula(lines);
+        System.out.println(formula);
 
         System.out.println("SAT solver starts!!!");
         long started = System.nanoTime();
@@ -171,11 +109,11 @@ public class SATSolverTest {
             {
 //                System.out.println(line);
                 String[] literals_arr = line.trim().split("\\s+"); // to store literal labels
-                for (String aa : literals_arr)
-                    System.out.println(aa);
+//                for (String aa : literals_arr)
+//                    System.out.println(aa);
 
                 for (String l_str : literals_arr){
-                    System.out.println(l_str);
+//                    System.out.println(l_str);
                     if(l_str.charAt(0) == '-'){
                         Literal l = NegLiteral.make(l_str.substring(1));
 //                        System.out.println(l);
@@ -195,41 +133,12 @@ public class SATSolverTest {
         return makeFm(clause_ls);
     }
 
-    
-//    public Environment testSATSolver1(){
-//      // (a v b)
-//      Environment e = SATSolver.solve(makeFm(makeCl(a,b)) );
-//      return e;
-/*
-        assertTrue( "one of the literals should be set to true",
-                Bool.TRUE == e.get(a.getVariable())  
-                || Bool.TRUE == e.get(b.getVariable())  );
-        
-*/      
-//    }
-    
-    
-//    public Environment testSATSolver2(){
-//      // (~a)
-//      Environment e = SATSolver.solve(makeFm(makeCl(na)));
-//        return e;
-//      /*
-//      assertEquals( Bool.FALSE, e.get(na.getVariable()));
-//*/
-//    }
-    
-//    private static Formula makeFm(Clause... e) {
-//        Formula f = new Formula();
-//        for (Clause c : e) {
-//            f = f.addClause(c);
-//        }
-//        return f;
-//    }
     private static Formula makeFm(ArrayList<Clause> clauses_arr) {
         Formula f = new Formula();
         for (Clause c : clauses_arr) {
             f = f.addClause(c);
         }
+        return f;
     }
 
 //    private static Clause makeCl(Literal... e) {
@@ -245,7 +154,7 @@ public class SATSolverTest {
         for (Literal l : literals_arr) {
             c = c.add(l);
         }
-        return clauses;
+        return c;
     }
 
 //    public static void main(String [] args){
@@ -255,3 +164,4 @@ public class SATSolverTest {
 ////        System.out.println("hello world");
 //    }
 }
+
