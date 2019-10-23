@@ -21,12 +21,9 @@ public class SATSolver {
      *         null if no such environment exists.
      */
     public static Environment solve(Formula formula) {
-//        System.out.println("solve started");
-//        System.out.println(formula.getClauses());
         Environment result = solve(formula.getClauses(),new Environment());
         if(!(result== null)) return result;
         else return null;
-
     }
 
     /**
@@ -44,51 +41,39 @@ public class SATSolver {
     private static Environment solve(ImList<Clause> clauses, Environment env) {
         if(clauses.isEmpty()){
             return env;
+//          if there are no clauses, the formula is trivially satisfiable; recursion ends
         }
         int smallest = clauses.first().size();
         Clause smallest_cl = clauses.first();
-        for(Clause cl : clauses){
-            if(cl.isEmpty()){
+        for(Clause cl : clauses) {
+            if (cl.isEmpty()) {
                 return null;
+//              empty clause denotes FALSE in which case formula is unsatisfiable; recursion ends
             }
-            if(cl.size() < smallest){
+            if (cl.size() < smallest) {
                 smallest = cl.size();
                 smallest_cl = cl;
             }
         }
-        //System.out.println(smallest_cl);
 
         Literal l = smallest_cl.chooseLiteral(); //choose the first literal of the smallest clause
-//        System.out.println( smallest_cl );
         if(smallest_cl.isUnit()){
-//            System.out.println("uniclause detected");
-//            clauses = substitute(clauses , l );
-            //set environment
-//            env = updateEnv(l, env);
-//            System.out.print("uniclause l switched:");
-//            System.out.println(l);
             return solve(substitute(clauses , l ), updateEnv(l, env));
-
         }else{
-//            ImList<Clause> new_clauses = substitute(clauses , l);
-            //set environment
-//            Environment new_env = updateEnv(l, env);
             Environment temp_env = solve(substitute(clauses , l), updateEnv(l, env));
-//            System.out.print("case switched:");
-//            System.out.println(l);
-
             if(temp_env == null){
-//                ImList<Clause> new_false_clauses = substitute(clauses , l.getNegation());
-                //set environment
-//                Environment new_false_env = updateEnv(l.getNegation(), env);
-//                System.out.print("case negate switched:");
-//                System.out.println(l);
+/*              if temp_env is null, the formula is unsatisfiable for l set to TRUE.
+                Hence, we must backtrack and set its value to FALSE and substitute again.
+                If the Environment is still null, we have to backtrack further until temp_env
+                is not null, or the formula is unsatisfiable.
+ */
                 return solve(substitute(clauses , l.getNegation()), updateEnv(l.getNegation(), env));
             }
             return temp_env;
         }
 
     }
+
     private static Environment updateEnv( Literal l, Environment env){
         if(l instanceof PosLiteral ){
             return env.putTrue(l.getVariable());
@@ -108,27 +93,13 @@ public class SATSolver {
      *            , a literal to set to true
      * @return a new list of clauses resulting from setting l to true
      */
-    private static ImList<Clause> substitute(ImList<Clause> clauses,
-                                             Literal l) {
-//        for(Clause cl : clauses){
-////            Clause reduced = cl.reduce(l);
-//            if(cl.reduce(l) != null){
-//                clauses = clauses.remove(cl).add(cl.reduce(l));
-////                clauses = clauses.add(reduced);
-//            }else{
-//                clauses = clauses.remove(cl);
-//            }
-//        }
+    private static ImList<Clause> substitute(ImList<Clause> clauses, Literal l) {
         for(Clause cl : clauses){
-//            Clause reduced = cl.reduce(l);
             if(cl.contains(l)){
                 clauses = clauses.remove(cl);
             }else if(cl.contains(l.getNegation())){
                 clauses = clauses.remove(cl).add(cl.reduce(l));
-            }else{
-                continue;
             }
-
         }
         return clauses;
     }
