@@ -40,6 +40,23 @@ public class SATSolverTest {
         } else {
             System.out.println("satisfiable");
             System.out.println(env.toString());
+            try {
+                String nameOfOutputFile = "BoolAssignment.txt";
+                FileWriter fw = new FileWriter(yourFilePath + nameOfOutputFile);
+                PrintWriter output = new PrintWriter(fw);
+                for (int ivar = 1; ivar <= numOfVar; ivar++) {
+                    Bool bool = env.get(new Variable(Integer.toString(ivar))); // get the boolean values of the variables from the env
+                    if (bool == Bool.TRUE) {
+                        output.println(Integer.toString(ivar) + ":TRUE");
+                    }
+                    else { // if (bool == Bool.FALSE)
+                        output.println(Integer.toString(ivar) + ":FALSE");
+                    }
+                }
+                output.close();
+            } catch (IOException e) { // to catch error, if there is.
+                e.printStackTrace();
+            }
         }
     }
 
